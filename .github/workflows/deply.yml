@@ -1,4 +1,4 @@
-name: CI-CD Pipeline
+name: CD Deploy
 
 on:
   push:
@@ -6,30 +6,29 @@ on:
       - main
 
 jobs:
-  build:
+
+  deploy:
 
     runs-on: ubuntu-latest
 
     steps:
 
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Setup Java
-      uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '17'
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
 
-    - name: Build Jar
-      run: mvn clean package
+      - name: Setup kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > $HOME/.kube/config
 
-    - name: Docker Login
-      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+      - name: Update Kubernetes deployment
+        run: |
+          kubectl set image deployment/springboot-deployment \
+          springboot-container=bckdkr/taskmanager:latest
 
-    - name: Build Docker Image
-      run: docker build -t bckdkr/taskmanager:latest .
-
-    - name: Push Docker Image
-
-      run: docker push bckdkr/taskmanager:latest
+          kubectl rollout restart deployment springboot-deployment
