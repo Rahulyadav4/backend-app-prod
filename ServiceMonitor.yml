@@ -1,0 +1,11 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: taskmanager-monitor
+spec:
+  selector:
+    matchLabels:
+      app: taskmanager
+  endpoints:
+  - port: http
+    path: /actuator/prometheus
