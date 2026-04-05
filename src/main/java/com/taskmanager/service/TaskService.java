@@ -3,6 +3,7 @@ package com.taskmanager.service;
 import com.taskmanager.model.Task;
 import com.taskmanager.repository.TaskRepository;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -24,8 +25,9 @@ public class TaskService {
   return task.getId();
  }
 
- public Task getTask(String id){
-  return repo.findById(id).orElse(null);
+ @Cacheable(value = "task", key = "#id")
+ public Task getTask(String id) {
+     return repo.findById(id).orElse(null);
  }
 
  public String updateTask(Task task){
