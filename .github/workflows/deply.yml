@@ -31,11 +31,11 @@ jobs:
 
       # 5. Build Docker Image
       - name: Build Docker Image
-        run: docker build -t bckdr/taskmanager:latest .
+        run: docker build -t bckdkr/taskmanager:latest .
 
       # 6. Push Docker Image
       - name: Push Docker Image
-        run: docker push bckdr/taskmanager:latest
+        run: docker push bckdkr/taskmanager:latest
 
       # 7. Setup Kubeconfig
       - name: Set up Kubeconfig
