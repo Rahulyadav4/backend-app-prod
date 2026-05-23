@@ -1,8 +1,7 @@
 package com.taskmanager.repository;
 
-import org.springframework.data.mongodb.repository.MongoRepository;
 import com.taskmanager.model.Task;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface TaskRepository extends MongoRepository<Task,String>{
-
+public interface TaskRepository extends MongoRepository<Task, String> {
 }

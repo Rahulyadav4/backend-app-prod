@@ -1,8 +1,9 @@
 package com.taskmanager.controller;
 
-import org.springframework.web.bind.annotation.*;
 import com.taskmanager.model.Task;
 import com.taskmanager.service.TaskService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/tasks")
@@ -14,35 +15,32 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    // health check
     @GetMapping("/control")
-    public String control() {
-        return "working";
+    public ResponseEntity<String> control() {
+        return ResponseEntity.ok("working");
     }
 
-    // CREATE
     @PostMapping
-    public String create(@RequestBody Task task) {
-        return taskService.createTask(task);
+    public ResponseEntity<String> create(@RequestBody Task task) {
+        return ResponseEntity.ok(taskService.createTask(task));
     }
 
-    // READ
     @GetMapping("/{id}")
-    public Task getTask(@PathVariable("id") String id) {
-        return taskService.getTask(id);
+    public ResponseEntity<Task> getTask(@PathVariable String id) {
+        // FIX SDE-1: Service now throws 404 — no null body
+        return ResponseEntity.ok(taskService.getTask(id));
     }
 
-    // UPDATE
     @PutMapping("/{id}")
-    public String update(@PathVariable("id") String id,
-                         @RequestBody Task task) {
+    public ResponseEntity<String> update(
+            @PathVariable String id,
+            @RequestBody Task task) {
         task.setId(id);
-        return taskService.updateTask(task);
+        return ResponseEntity.ok(taskService.updateTask(task));
     }
 
-    // DELETE
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") String id) {
-        return taskService.deleteTask(id);
+    public ResponseEntity<String> delete(@PathVariable String id) {
+        return ResponseEntity.ok(taskService.deleteTask(id));
     }
 }

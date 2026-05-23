@@ -1,9 +1,8 @@
 version: '3.8'
-
 services:
 
   mongo:
-    image: mongo
+    image: mongo:6
     container_name: mongo
     ports:
       - "27017:27017"
@@ -12,6 +11,15 @@ services:
     volumes:
       - mongo-data:/data/db
 
+  # FIX SDE-1: Added Redis to docker-compose — was missing for local dev
+  redis:
+    image: redis:7.0
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - task-network
+
   task-api:
     build: .
     container_name: task-api
@@ -19,10 +27,18 @@ services:
       - "8080:8080"
     depends_on:
       - mongo
+      - redis
     networks:
       - task-network
     environment:
       - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/taskdb
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_CACHE_TYPE=redis
+      # FIX SDE-2: Secrets as env vars — not hardcoded in source
+      - JWT_SECRET=local-dev-only-secret-key-32chars!!
+      - APP_USERNAME=admin
+      - APP_PASSWORD=admin123
+      - REDIS_HOST=redis
 
 networks:
   task-network:
