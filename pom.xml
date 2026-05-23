@@ -1,153 +1,139 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.gcp_project</groupId>
   <artifactId>taskmanager</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  
-  
-  
+
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>3.2.0</version>
-    <relativePath/> 
-</parent>
+    <relativePath/>
+  </parent>
 
-<dependencies>
-    <!-- Spring Web for REST APIs -->
+  <dependencies>
+    <!-- Rate limiting -->
     <dependency>
-    <groupId>com.bucket4j</groupId>
-    <artifactId>bucket4j-core</artifactId>
-    <version>8.7.0</version>
-	</dependency>
-
-<!-- Circuit breaker core -->
-<dependency>
-    <groupId>io.github.resilience4j</groupId>
-    <artifactId>resilience4j-spring-boot3</artifactId>
-    <version>2.1.0</version>
-</dependency>
-
-<!-- AOP is REQUIRED — without this, annotations are ignored -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-aop</artifactId>
-</dependency>
-    
-    <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-web</artifactId>
+      <groupId>com.bucket4j</groupId>
+      <artifactId>bucket4j-core</artifactId>
+      <version>8.7.0</version>
     </dependency>
-    
-    <dependency>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-actuator</artifactId>
-	</dependency>
 
-	<dependency>
-		<groupId>io.micrometer</groupId>
-		<artifactId>micrometer-registry-prometheus</artifactId>
-	</dependency>
-	
-	<dependency>
-  	<groupId>org.springframework.boot</groupId>
-  	<artifactId>spring-boot-starter-data-redis</artifactId>
-	</dependency>
-    
-    
+    <!-- Circuit breaker -->
     <dependency>
- 		<groupId>org.springframework.boot</groupId>
- 		<artifactId>spring-boot-starter-test</artifactId>
- 		<scope>test</scope>
-	</dependency>
+      <groupId>io.github.resilience4j</groupId>
+      <artifactId>resilience4j-spring-boot3</artifactId>
+      <version>2.1.0</version>
+    </dependency>
 
-	<dependency>
- 		<groupId>org.mockito</groupId>
- 		<artifactId>mockito-core</artifactId>
- 		<scope>test</scope>
-	</dependency>
-    
+    <!-- AOP required for annotations -->
     <dependency>
- 		<groupId>io.micrometer</groupId>
- 		<artifactId>micrometer-registry-prometheus</artifactId>
-	</dependency>
-    
-    <dependency>
- 		<groupId>org.springframework.boot</groupId>
- 		<artifactId>spring-boot-starter-actuator</artifactId>
-	</dependency>
-    
-    <dependency>
- 		<groupId>org.springframework.boot</groupId>
- 		<artifactId>spring-boot-starter-data-mongodb</artifactId>
-	</dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-aop</artifactId>
+    </dependency>
 
-    <!-- JPA + H2 for testing DB locally -->
+    <!-- Web -->
     <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-data-jpa</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+
+    <!-- Actuator -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+    <!-- Prometheus metrics -->
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
+
+    <!-- Redis -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+
+    <!-- MongoDB -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-mongodb</artifactId>
+    </dependency>
+
+    <!-- JPA + H2 for local testing ONLY — test scope, not included in production image -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
-        <groupId>com.h2database</groupId>
-        <artifactId>h2</artifactId>
-        <scope>runtime</scope>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
     </dependency>
-    
-    
-    <!-- https://mvnrepository.com/artifact/com.google.cloud/google-cloud-firestore -->
-	<dependency>
-    	<groupId>com.google.cloud</groupId>
-    	<artifactId>google-cloud-firestore</artifactId>
-    	<version>3.10.0</version>
-	</dependency>
 
-
-<!-- https://mvnrepository.com/artifact/com.google.firebase/firebase-admin -->
-<dependency>
-    <groupId>com.google.firebase</groupId>
-    <artifactId>firebase-admin</artifactId>
-    <version>9.2.0</version>
-</dependency>
-
-    <!-- Optional: Lombok to reduce boilerplate -->
+    <!-- Firestore -->
     <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-        <optional>true</optional>
+      <groupId>com.google.cloud</groupId>
+      <artifactId>google-cloud-firestore</artifactId>
+      <version>3.10.0</version>
     </dependency>
-    
-    
-    <dependency>
-  <groupId>io.jsonwebtoken</groupId>
-  <artifactId>jjwt-api</artifactId>
-  <version>0.11.5</version>
-</dependency>
-<dependency>
-  <groupId>io.jsonwebtoken</groupId>
-  <artifactId>jjwt-impl</artifactId>
-  <version>0.11.5</version>
-  <scope>runtime</scope>
-</dependency>
-<dependency>
-  <groupId>io.jsonwebtoken</groupId>
-  <artifactId>jjwt-jackson</artifactId>
-  <version>0.11.5</version>
-  <scope>runtime</scope>
-</dependency>
-    
-    
-    
-</dependencies>
 
-<build>
+    <!-- Firebase Admin -->
+    <dependency>
+      <groupId>com.google.firebase</groupId>
+      <artifactId>firebase-admin</artifactId>
+      <version>9.2.0</version>
+    </dependency>
+
+    <!-- Lombok -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <!-- JWT -->
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-api</artifactId>
+      <version>0.11.5</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-impl</artifactId>
+      <version>0.11.5</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt-jackson</artifactId>
+      <version>0.11.5</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- Test -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
     <plugins>
-        <plugin>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-maven-plugin</artifactId>
-        </plugin>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
     </plugins>
-</build>
-  
-  
-  
+  </build>
 </project>
