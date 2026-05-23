@@ -19,7 +19,7 @@ public class TaskControllerTest {
         Task task = new Task();
         when(service.createTask(task)).thenReturn("123");
 
-        String result = controller.create(task);
+        String result = controller.create(task).getBody();
 
         assertEquals("123", result);
     }
