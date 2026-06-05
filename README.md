@@ -1,4 +1,4 @@
-Scalable Spring Boot Microservice | Kubernetes + Monitoring
+### Scalable Spring Boot Microservice | Kubernetes + Monitoring
 A production style backend project demonstrating Spring Boot microservices deployed on Kubernetes, with autoscaling, monitoring (Prometheus), and observability using Grafana.
 
  ### Overview
