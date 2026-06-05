@@ -1,7 +1,7 @@
 Scalable Spring Boot Microservice | Kubernetes + Monitoring
 A production style backend project demonstrating Spring Boot microservices deployed on Kubernetes, with autoscaling, monitoring (Prometheus), and observability using Grafana.
 
- Overview
+ ### Overview
  This project simulates a real world backend system where:
  REST APIs handle user requests
  Application runs inside Docker containers
@@ -9,7 +9,7 @@ A production style backend project demonstrating Spring Boot microservices deplo
  Scaled dynamically using HPA
  Monitored using Prometheus & Grafana
 
- Tech Stack
+ ### Tech Stack
  Backend: Spring Boot (Java)
  Database: MongoDB
  Caching:Redis
@@ -20,7 +20,7 @@ A production style backend project demonstrating Spring Boot microservices deplo
  CI: GitHub Actions
  Testing: Postman
 
- Features
+ ### Features
   JWT based authentication & authorization  
   REST APIs with layered architecture (Controller → Service → Repository)  
   Redis for optimised read 
@@ -31,10 +31,10 @@ A production style backend project demonstrating Spring Boot microservices deplo
   Metrics exposed via prometheus 
   Monitoring dashboards in Grafana  
 
- System Architecture
+ ### System Architecture
  User → Ingress → Kubernetes Service → Pod (Spring Boot) → Redis→ MongoDB→ Metrics → Prometheus → Grafana
 
-End to End Flow
+### End to End Flow
 User sends request (Postman / API client)
 Request enters cluster via Service/Ingress
 Kubernetes routes request to one of the pods
