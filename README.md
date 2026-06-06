@@ -1,46 +1,57 @@
-### Scalable Spring Boot Microservice | Kubernetes + Monitoring
-A production style backend project demonstrating Spring Boot microservices deployed on Kubernetes, with autoscaling, monitoring (Prometheus), and observability using Grafana.
+# ☸️ Scalable Spring Boot Microservice | Kubernetes + Monitoring
 
- ### Overview
- This project simulates a real world backend system where:
- REST APIs handle user requests
- Application runs inside Docker containers
- Deployed on Kubernetes cluster (Minikube)
- Scaled dynamically using HPA
- Monitored using Prometheus & Grafana
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=springboot&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat&logo=kubernetes&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
+![Prometheus](https://img.shields.io/badge/Prometheus-E6522C?style=flat&logo=prometheus&logoColor=white)
+![Grafana](https://img.shields.io/badge/Grafana-F46800?style=flat&logo=grafana&logoColor=white)
 
- ### Tech Stack
- Backend: Spring Boot (Java)
- Database: MongoDB
- Caching:Redis
- Containerization: Docker
- Orchestration: Kubernetes (Minikube)
- Monitoring: Prometheus, Grafana
- Metrics: Micrometer + Actuator
- CI: GitHub Actions
- Testing: Postman
+A production-style backend project demonstrating Spring Boot microservices deployed on Kubernetes, with autoscaling, monitoring via Prometheus, and observability using Grafana.
 
- ### Features
-  JWT based authentication & authorization  
-  REST APIs with layered architecture (Controller → Service → Repository)  
-  Redis for optimised read 
-  Dockerized application  
-  Kubernetes deployment with pods, services  
-  Horizontal Pod Autoscaler (HPA) for load based scaling  
-  Health checks using readiness & liveness probes  
-  Metrics exposed via prometheus 
-  Monitoring dashboards in Grafana  
+---
 
- ### System Architecture
- User → Ingress → Kubernetes Service → Pod (Spring Boot) → Redis→ MongoDB→ Metrics → Prometheus → Grafana
+## 📖 Overview
 
-### End to End Flow
-User sends request (Postman / API client)
-Request enters cluster via Service/Ingress
-Kubernetes routes request to one of the pods
-Spring Boot app processes request
-Request recievd in Redis cache. Request  processed if hit and forwarded to DynamoDB when miss.
-Data stored/retrieved from MongoDB
-Metrics generated via Micrometer
-Prometheus scrapes metrics
-Grafana visualizes metrics
+This project simulates a real-world backend system where:
+
+- REST APIs handle user requests
+- Application runs inside Docker containers
+- Deployed on a Kubernetes cluster (Minikube)
+- Scaled dynamically using HPA (Horizontal Pod Autoscaler)
+- Monitored using Prometheus & Grafana
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Backend | Spring Boot (Java) |
+| Database | MongoDB |
+| Caching | Redis |
+| Containerization | Docker |
+| Orchestration | Kubernetes (Minikube) |
+| Monitoring | Prometheus, Grafana |
+| Metrics | Micrometer + Actuator |
+| CI | GitHub Actions |
+| Testing | Postman |
+
+---
+
+## ✨ Features
+
+- 🔐 JWT-based authentication & authorization
+- 🌐 REST APIs with layered architecture (`Controller → Service → Repository`)
+- ⚡ Redis for optimized read performance
+- 🐳 Dockerized application
+- ☸️ Kubernetes deployment with pods and services
+- 📈 Horizontal Pod Autoscaler (HPA) for load-based scaling
+- 🩺 Health checks via readiness & liveness probes
+- 📊 Metrics exposed via Prometheus
+- 📉 Monitoring dashboards in Grafana
+
+---
+
+## 🏗️ System Architecture
+
+
