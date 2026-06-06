@@ -16,7 +16,7 @@ This project simulates a real-world backend system where:
 
 - REST APIs handle user requests
 - Application runs inside Docker containers
-- Deployed on a Kubernetes cluster (Minikube)
+- Deployed on a Kubernetes cluster
 - Scaled dynamically using HPA (Horizontal Pod Autoscaler)
 - Monitored using Prometheus & Grafana
 
@@ -30,7 +30,7 @@ This project simulates a real-world backend system where:
 | Database | MongoDB |
 | Caching | Redis |
 | Containerization | Docker |
-| Orchestration | Kubernetes (Minikube) |
+| Orchestration | Kubernetes |
 | Monitoring | Prometheus, Grafana |
 | Metrics | Micrometer + Actuator |
 | CI | GitHub Actions |
