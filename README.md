@@ -54,4 +54,21 @@ This project simulates a real-world backend system where:
 
 ## 🏗️ System Architecture
 
+---
+
+## 🔄 End-to-End Flow
+
+1. **Request** — User sends a request via Postman or API client
+2. **Entry** — Request enters the cluster via Service / Ingress
+3. **Routing** — Kubernetes routes the request to an available pod
+4. **Processing** — Spring Boot app processes the incoming request
+5. **Cache Check** — Request checked against Redis cache:
+   - **Cache Hit** → Response served directly from Redis
+   - **Cache Miss** → Request forwarded to MongoDB
+6. **Persistence** — Data stored/retrieved from MongoDB
+7. **Metrics** — Micrometer generates application metrics
+8. **Scraping** — Prometheus scrapes metrics from the app
+9. **Visualization** — Grafana visualizes metrics on dashboards
+
+
 
