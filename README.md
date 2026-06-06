@@ -1,4 +1,4 @@
-# ☸️ Scalable Spring Boot Microservice | Kubernetes + Monitoring
+# Scalable Spring Boot Microservice | Kubernetes + Monitoring
 
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat&logo=springboot&logoColor=white)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-326CE5?style=flat&logo=kubernetes&logoColor=white)
@@ -38,7 +38,7 @@ This project simulates a real-world backend system where:
 
 ---
 
-## ✨ Features
+## Features
 
 - 🔐 JWT-based authentication & authorization
 - 🌐 REST APIs with layered architecture (`Controller → Service → Repository`)
@@ -52,11 +52,11 @@ This project simulates a real-world backend system where:
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ---
 
-## 🔄 End-to-End Flow
+## End-to-End Flow
 
 1. **Request** — User sends a request via Postman or API client
 2. **Entry** — Request enters the cluster via Service / Ingress
