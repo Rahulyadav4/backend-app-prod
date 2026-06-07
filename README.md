@@ -2,7 +2,7 @@
 
 # Task Manager Microservice
 
-### Production-style Spring Boot service — containerized, orchestrated, cached, circuit-broken, and monitored
+### Spring Boot service — containerized, orchestrated, cached, circuit-broken, and monitored
 
 [![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-6DB33F?style=flat-square&logo=springboot)](https://spring.io/projects/spring-boot)
