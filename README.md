@@ -1,4 +1,110 @@
+<div align="center">
+
 # Task Manager Microservice
+
+### Production-style Spring Boot service — containerized, orchestrated, cached, circuit-broken, and monitored
+
+[![Java](https://img.shields.io/badge/Java-21-orange?style=flat-square&logo=openjdk)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-6DB33F?style=flat-square&logo=springboot)](https://spring.io/projects/spring-boot)
+[![MongoDB](https://img.shields.io/badge/MongoDB-7.x-47A248?style=flat-square&logo=mongodb)](https://www.mongodb.com/)
+[![Redis](https://img.shields.io/badge/Redis-7.x-DC382D?style=flat-square&logo=redis)](https://redis.io/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Minikube-326CE5?style=flat-square&logo=kubernetes)](https://minikube.sigs.k8s.io/)
+[![Prometheus](https://img.shields.io/badge/Prometheus-Scraping-E6522C?style=flat-square&logo=prometheus)](https://prometheus.io/)
+[![Grafana](https://img.shields.io/badge/Grafana-Dashboards-F46800?style=flat-square&logo=grafana)](https://grafana.com/)
+
+</div>
+
+---
+
+## What This Is
+
+A backend project built to simulate a real-world production environment on a local machine.
+It goes beyond a basic CRUD API — every layer has a deliberate engineering decision behind it.
+
+The service manages tasks via a secured REST API. Under the hood it demonstrates the patterns
+backend engineers apply at scale: distributed caching, fault isolation, horizontal scaling,
+container-aware resource management, and a full metrics pipeline.
+
+---
+
+## System Architecture
+
+                      ┌─────────────────────────────────────────┐
+                      │            Kubernetes Cluster            │
+                      │                                          │
+Client / Postman │ ┌──────────────────────────────────┐ │ │ │ │ springboot-service │ │ │ HTTP Request │ │ (NodePort) │ │ └──────────────────┼──►│ │ │ │ └────────────┬─────────────────────┘ │ │ │ routes to │ │ ┌────────────▼─────────────────────┐ │ │ │ HPA (2–5 Pods) │ │ │ │ │ │ │ │ ┌─────────┐ ┌─────────┐ │ │ │ │ │ Pod 1 │ │ Pod 2 │ ... │ │ │ │ │Spring │ │Spring │ │ │ │ │ │Boot App │ │Boot App │ │ │ │ │ └────┬────┘ └────┬────┘ │ │ │ └───────┼─────────────┼───────────┘ │ │ │ shared │ │ │ ┌───────▼──────────────▼───────────┐ │ │ │ Redis Cache │ │ │ │ (shared across pods) │ │ │ └───────────────────┬──────────────┘ │ │ │ cache miss │ │ ┌───────────────────▼──────────────┐ │ │ │ MongoDB │ │ │ └──────────────────────────────────┘ │ │ │ │ ┌──────────────────────────────────┐ │ │ │ /actuator/prometheus → │ │ │ │ Prometheus → Grafana │ │ │ └──────────────────────────────────┘ │ └─────────────────────────────────────────┘
+
+
+---
+
+## Request Lifecycle
+
+| Step | What Happens |
+|---|---|
+| 1 | Client sends HTTP request to the NodePort service |
+| 2 | Kubernetes routes request to one of 2–5 running pods |
+| 3 | `JwtAuthFilter` intercepts — validates Bearer token or rejects with 401 |
+| 4 | Controller delegates to `TaskService` (no business logic in controller) |
+| 5 | `TaskService` checks shared Redis cache — returns in ~2–5ms on hit |
+| 6 | On cache miss, Resilience4j circuit breaker checks MongoDB health |
+| 7 | If circuit is closed, `TaskRepository` queries MongoDB (~8–28ms total) |
+| 8 | Result written to Redis (10-min TTL) — next read is a cache hit |
+| 9 | Micrometer records latency, hit/miss counts, circuit breaker state |
+| 10 | Prometheus scrapes `/actuator/prometheus` every 10s — Grafana visualizes |
+
+---
+
+## Tech Stack
+
+| Layer | Technology | Purpose |
+|---|---|---|
+| Language | Java 21 | LTS release, virtual thread ready |
+| Framework | Spring Boot 3.x | REST, DI, AOP, Actuator |
+| Database | MongoDB | Document store, Spring Data repository |
+| Cache | Redis + Lettuce | Shared distributed cache, JSON serialized |
+| Auth | JWT (HMAC-SHA) | Stateless authentication, 1hr expiry |
+| Rate Limiting | Bucket4j | Per-IP token bucket, 10 req/min |
+| Resilience | Resilience4j | Circuit breaker on MongoDB read path |
+| Containerization | Docker | Reproducible image, container-aware JVM |
+| Orchestration | Kubernetes (Minikube) | Pod lifecycle, services, config |
+| Autoscaling | HPA | 2–5 replicas at 70% CPU threshold |
+| Health Checks | Spring Actuator Probes | Liveness (JVM) + Readiness (dependencies) |
+| Metrics | Micrometer + Actuator | JVM, HTTP, circuit breaker metrics |
+| Monitoring | Prometheus + Grafana | Scrape pipeline + visualization |
+| CI | GitHub Actions | Build and image pipeline |
+| Testing | Postman | API contract verification |
+
+---
+
+## Core Features
+
+**Security**
+- JWT authentication on all `/tasks/*` endpoints
+- HMAC-SHA signing — key loaded once at JVM startup
+- Per-IP rate limiting on login — 10 requests/min via Bucket4j
+
+**Caching**
+- Redis cache shared across all pods — a cache hit on Pod 1 is a hit on Pod 2
+- `@CacheEvict` on every update and delete — no stale data served
+- 10-minute TTL with JSON serialization via `GenericJackson2JsonRedisSerializer`
+
+**Resilience**
+- Resilience4j `mongoBreaker` circuit breaker on the read path
+- MongoDB connection timeout: 3s connect / 5s socket — threads released on failure
+- 2-pod minimum ensures zero downtime on single pod failure
+
+**Scaling**
+- HPA scales 2 → 5 pods at 70% average CPU
+- Stateless pods — no sticky sessions, any pod handles any request
+- New pods join the load balancer only after passing the readiness probe
+
+**Observability**
+- Liveness probe: JVM health only — avoids restarts on transient dependency failure
+- Readiness probe: checks MongoDB + Redis — removes unhealthy pod from load balancer
+- Full Prometheus scrape pipeline via `ServiceMonitor`
+- Grafana dashboards for JVM, HTTP latency, throughput, circuit breaker state
+
+# Task Manager Microservice - Detailed metrics
 
 A production-grade REST API built with Spring Boot, deployed on Kubernetes (Minikube), demonstrating
 distributed caching, circuit breaking, horizontal pod autoscaling, and observability.
