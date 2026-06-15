@@ -24,6 +24,7 @@ It goes beyond a basic CRUD API — every layer has an impacting engineering dec
 The service manages tasks via a secured REST API. Under the hood it demonstrates the patterns
 backend engineers apply at scale: distributed caching, fault isolation, horizontal scaling,
 container-aware resource management, and a full metrics pipeline.
+(**ongoing kafka addon to this)
 
 ---
 
