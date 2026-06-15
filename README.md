@@ -19,7 +19,7 @@
 ## What This Is
 
 A backend project built to simulate a real-world production environment on a local machine.
-It goes beyond a basic CRUD API — every layer has a deliberate engineering decision behind it.
+It goes beyond a basic CRUD API — every layer has an impacting engineering decision behind it.
 
 The service manages tasks via a secured REST API. Under the hood it demonstrates the patterns
 backend engineers apply at scale: distributed caching, fault isolation, horizontal scaling,
