@@ -157,8 +157,13 @@ maxReplicas: 5
 targetCPUUtilizationPercentage: 70
 Kept at max 5 replicas — tuned for Minikube's local resource constraints.
 
-<div align="center">
-Built with Java 21 · Spring Boot · Kafka · MongoDB · Redis · Kubernetes
+---
 
-Real-time ingestion · Resilient caching · Production-ready observability
-</div align="center">```
+<div align="center">
+
+**Built with Java 21 · Spring Boot · Kafka · MongoDB · Redis · Kubernetes**
+
+*Real-time ingestion · Resilient caching · Production-ready observability*
+
+</div>
+`
