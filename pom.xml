@@ -19,6 +19,13 @@
       <artifactId>bucket4j-core</artifactId>
       <version>8.7.0</version>
     </dependency>
+    
+    <!-- Kafka -->
+<dependency>
+    <groupId>org.springframework.kafka</groupId>
+    <artifactId>spring-kafka</artifactId>
+</dependency>
+
 
     <!-- Circuit breaker -->
     <dependency>
