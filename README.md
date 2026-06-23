@@ -156,7 +156,9 @@ minReplicas: 2
 maxReplicas: 5
 targetCPUUtilizationPercentage: 70
 Kept at max 5 replicas — tuned for Minikube's local resource constraints.
-
+```bash
+minikube service springboot-service
+```
 ---
 
 <div align="center">
