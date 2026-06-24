@@ -45,7 +45,7 @@ Real-time source system appends rows to a .csv file └─► format: id, title,
 
 Kafka Producer watches the file └─► reads new lines every few milliseconds └─► publishes each row to a Kafka topic
 
-Kafka Consumer subscribes to the topic └─► parses fields by configured mapping └─► upserts Task documents into MongoDB
+Kafka Consumer subscribes to the topic └─► parses fields by configured mapping └─► upserts Task documents into MongoDB (MongoDb is the target db)
 
 Redis cache evicted on every write └─► GET requests always reflect latest data
 
