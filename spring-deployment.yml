@@ -105,4 +105,14 @@ csv:
 csv:
   poll:
     interval: 30000   # milliseconds — adjust as needed
+    
+spring:
+  kafka:
+    consumer:
+      max-poll-records: 500
+      enable-auto-commit: false
+kafka:
+  topic:
+    tasks: tasks-topic
+    partitions: 3
 
