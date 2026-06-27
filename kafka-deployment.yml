@@ -66,6 +66,15 @@ spec:
               value: "PLAINTEXT://kafka:9092"
             - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
               value: "1"
+            - name: KAFKA_HEAP_OPTS
+              value: "-Xmx512m -Xms512m"
+          resources:
+            requests:
+              memory: "768Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
 ---
 apiVersion: v1
 kind: Service
