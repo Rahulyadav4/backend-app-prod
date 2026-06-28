@@ -46,6 +46,8 @@ spec:
                   key: APP_PASSWORD
             - name: REDIS_HOST
               value: "redis"
+            - name: KAFKA_BOOTSTRAP_SERVERS  
+              value: "kafka:9092"
           # SENIOR FIX: Liveness on /liveness — not MongoDB
           livenessProbe:
             httpGet:
