@@ -14,8 +14,6 @@ spec:
       labels:
         app: springboot
     spec:
-      imagePullSecrets:
-        - name: dockerhub-secret
       containers:
         - name: springboot-container
           image: bckdkr/taskmanager:latest
