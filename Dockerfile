@@ -1,7 +1,7 @@
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
 COPY target/taskmanager-0.0.1-SNAPSHOT.jar app.jar
-# FIX: JVM container-aware memory settings
+COPY tasks.csv /app/tasks.csv
 ENTRYPOINT ["java", \
   "-XX:+UseContainerSupport", \
   "-XX:MaxRAMPercentage=75.0", \
