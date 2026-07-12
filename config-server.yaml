@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-config
+spec:
+  clusterIP: None
+  selector:
+    app: mongo-config
+  ports:
+    - port: 27019
+      targetPort: 27019
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-config
+spec:
+  serviceName: mongo-config
+  replicas: 1 # scaled down for minikube — real prod wants 3 here
+  selector:
+    matchLabels: { app: mongo-config }
+  template:
+    metadata:
+      labels: { app: mongo-config }
+    spec:
+      containers:
+        - name: mongo-config
+          image: mongo:6
+          command: ["mongod", "--configsvr", "--replSet", "configReplSet", "--port", "27019", "--bind_ip_all"]
+          ports: [{ containerPort: 27019 }]
+          resources:
+            requests: { cpu: "80m", memory: "192Mi" }
+            limits: { cpu: "200m", memory: "384Mi" }
+          volumeMounts:
+            - { name: data, mountPath: /data/configdb }
+  volumeClaimTemplates:
+    - metadata: { name: data }
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources: { requests: { storage: 512Mi } }
+---
+apiVersion: batch/v1
+kind: Job
+metadata: { name: mongo-config-init }
+spec:
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: init
+          image: mongo:6
+          command:
+            - bash
+            - -c
+            - >
+              until mongosh --host mongo-config-0.mongo-config --port 27019 --eval "db.adminCommand('ping')"; do sleep 3; done;
+              mongosh --host mongo-config-0.mongo-config --port 27019 --eval '
+                rs.initiate({ _id: "configReplSet", configsvr: true,
+                  members: [ { _id: 0, host: "mongo-config-0.mongo-config:27019" } ] })' || true

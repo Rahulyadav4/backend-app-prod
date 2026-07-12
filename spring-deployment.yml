@@ -14,6 +14,8 @@ spec:
       labels:
         app: springboot
     spec:
+      imagePullSecrets:
+        - name: dockerhub-secret
       containers:
         - name: springboot-container
           image: bckdkr/taskmanager:latest
@@ -27,7 +29,6 @@ spec:
             limits:
               cpu: "500m"
               memory: "512Mi"
-          # FIX SDE-2: Secrets injected from K8s Secret
           env:
             - name: JWT_SECRET
               valueFrom:
@@ -46,9 +47,8 @@ spec:
                   key: APP_PASSWORD
             - name: REDIS_HOST
               value: "redis"
-            - name: KAFKA_BOOTSTRAP_SERVERS  
-              value: "kafka:9092"
-          # SENIOR FIX: Liveness on /liveness — not MongoDB
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-bootstrap:9092"
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
@@ -57,7 +57,6 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 5
-          # FIX SDE-2: Readiness on /readiness — checks Mongo + Redis
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
@@ -72,11 +71,9 @@ kind: Service
 metadata:
   name: springboot-service
 spec:
-  type: NodePort
+  type: ClusterIP # was NodePort — Ingress fronts it now, no need to expose the node directly
   selector:
     app: springboot
   ports:
     - port: 8080
       targetPort: 8080
-      nodePort: 30007
-

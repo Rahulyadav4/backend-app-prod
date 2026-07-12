@@ -5,6 +5,9 @@ import com.taskmanager.repository.TaskRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,12 +26,13 @@ public class TaskService {
         return task.getId();
     }
 
-    // FIX SDE-2: Circuit breaker wraps MongoDB call
-    // FIX SDE-2: @Cacheable now hits Redis (spring.cache.type=redis)
+    public Page<Task> listTasks(Pageable pageable) {
+        return repo.findAll(pageable);
+    }
+
     @CircuitBreaker(name = "mongoBreaker", fallbackMethod = "getTaskFallback")
     @Cacheable(value = "task", key = "#id")
     public Task getTask(String id) {
-        // FIX SDE-1: 404 instead of null body
         return repo.findById(id)
             .orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Task not found: " + id));
@@ -40,14 +44,17 @@ public class TaskService {
             "Service temporarily unavailable. Try again shortly.");
     }
 
-    // FIX SDE-1: @CacheEvict — clears Redis entry on update
     @CacheEvict(value = "task", key = "#task.id")
     public String updateTask(Task task) {
-        repo.save(task);
+        try {
+            repo.save(task);
+        } catch (OptimisticLockingFailureException e) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                "Task was modified concurrently — refetch and retry.");
+        }
         return "Updated";
     }
 
-    // FIX SDE-1: @CacheEvict — clears Redis entry on delete
     @CacheEvict(value = "task", key = "#id")
     public String deleteTask(String id) {
         repo.deleteById(id);

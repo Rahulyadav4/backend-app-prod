@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata: { name: mongo-shard-setup }
+spec:
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: shard-setup
+          image: mongo:6
+          command:
+            - bash
+            - -c
+            - >
+              until mongosh --host mongos --port 27017 --eval "db.adminCommand('ping')"; do sleep 3; done;
+              mongosh --host mongos --port 27017 --eval '
+                sh.addShard("shard0RS/mongo-shard0-0.mongo-shard0:27018");
+                sh.addShard("shard1RS/mongo-shard1-0.mongo-shard1:27018");
+                sh.enableSharding("taskdb");
+                sh.shardCollection("taskdb.tasks", { _id: "hashed" });
+              ' || true

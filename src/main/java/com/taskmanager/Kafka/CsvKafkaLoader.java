@@ -1,102 +1,55 @@
 package com.taskmanager.Kafka;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
+import com.taskmanager.model.Task;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.taskmanager.model.Task;
-
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 @Component
 public class CsvKafkaLoader {
 
     private static final Logger log = LoggerFactory.getLogger(CsvKafkaLoader.class);
+
     private final TaskKafkaProducer producer;
 
-    // NOTE: in-memory only — lost on restart. For production,
-    // persist this to Redis/a checkpoint file/Mongo instead.
-    private long linesAlreadyRead = 0;
+    @Value("${csv.file.path}")
+    private String csvFilePath;
 
-    public CsvKafkaLoader(TaskKafkaProducer producer)
-    {
+    public CsvKafkaLoader(TaskKafkaProducer producer) {
         this.producer = producer;
     }
 
     @Scheduled(fixedDelayString = "${csv.poll.interval:30000}")
+    @SchedulerLock(name = "csvKafkaLoader_load", lockAtMostFor = "PT1M", lockAtLeastFor = "PT10S")
     public void load() {
+        log.info("Loading tasks from CSV: {}", csvFilePath);
+        try (BufferedReader reader = new BufferedReader(new FileReader(csvFilePath))) {
+            String line;
+            boolean header = true;
+            while ((line = reader.readLine()) != null) {
+                if (header) { header = false; continue; }
+                String[] cols = line.split(",", -1);
+                if (cols.length < 4) continue;
 
-        log.info("Loading CSV: tasks.csv (resuming after line {})",
-                linesAlreadyRead);
+                Task task = new Task();
+                String id = cols[0].trim();
+                if (!id.isEmpty()) task.setId(id);
+                task.setTitle(cols[1].trim());
+                task.setDescription(cols[2].trim());
+                task.setStatus(cols[3].trim());
 
-        try {
-            InputStream is = getClass()
-                    .getClassLoader()
-                    .getResourceAsStream("tasks.csv");
-
-            if (is == null) {
-                throw new RuntimeException("tasks.csv not found in resources");
+                producer.send(task);
+                log.info("Published to Kafka: title={}", task.getTitle());
             }
-
-            try (BufferedReader reader =
-                         new BufferedReader(new InputStreamReader(is))) {
-
-                String line;
-                long currentLine = 0;
-                boolean header = true;
-                int published = 0;
-
-                while ((line = reader.readLine()) != null) {
-                    currentLine++;
-
-                    if (header) {
-                        header = false;
-                        continue;
-                    }
-
-                    if (currentLine <= linesAlreadyRead) {
-                        continue;
-                    }
-
-                    String[] cols = line.split(",", -1);
-
-                    if (cols.length < 4) {
-                        log.warn("Malformed row at line {}: {}",
-                                currentLine, line);
-                        continue;
-                    }
-
-                    Task task = new Task();
-                    String id = cols[0].trim();
-
-                    if (!id.isEmpty()) {
-                        task.setId(id);
-                    }
-
-                    task.setTitle(cols[1].trim());
-                    task.setDescription(cols[2].trim());
-                    task.setStatus(cols[3].trim());
-
-                    producer.send(task);
-                    published++;
-                }
-
-                linesAlreadyRead = currentLine;
-
-                log.info(
-                        "Published {} new rows. Total lines read: {}",
-                        published,
-                        linesAlreadyRead
-                );
-            }
-
-        } catch (Exception e) {
-            log.error("CSV read failed", e);
+        } catch (IOException e) {
+            log.error("Failed to read CSV file: {}", csvFilePath, e);
         }
     }
-    }
+}

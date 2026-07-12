@@ -1,0 +1,50 @@
+apiVersion: v1
+kind: Service
+metadata: { name: mongo-shard1 }
+spec:
+  clusterIP: None
+  selector: { app: mongo-shard1 }
+  ports: [{ port: 27018, targetPort: 27018 }]
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: { name: mongo-shard1 }
+spec:
+  serviceName: mongo-shard1
+  replicas: 1
+  selector: { matchLabels: { app: mongo-shard1 } }
+  template:
+    metadata: { labels: { app: mongo-shard1 } }
+    spec:
+      containers:
+        - name: mongo-shard1
+          image: mongo:6
+          command: ["mongod", "--shardsvr", "--replSet", "shard1RS", "--port", "27018", "--bind_ip_all"]
+          ports: [{ containerPort: 27018 }]
+          resources:
+            requests: { cpu: "100m", memory: "256Mi" }
+            limits: { cpu: "250m", memory: "512Mi" }
+          volumeMounts: [{ name: data, mountPath: /data/db }]
+  volumeClaimTemplates:
+    - metadata: { name: data }
+      spec: { accessModes: ["ReadWriteOnce"], resources: { requests: { storage: 1Gi } } }
+---
+apiVersion: batch/v1
+kind: Job
+metadata: { name: mongo-shard1-init }
+spec:
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: init
+          image: mongo:6
+          command:
+            - bash
+            - -c
+            - >
+              until mongosh --host mongo-shard1-0.mongo-shard1 --port 27018 --eval "db.adminCommand('ping')"; do sleep 3; done;
+              mongosh --host mongo-shard1-0.mongo-shard1 --port 27018 --eval '
+                rs.initiate({ _id: "shard1RS",
+                  members: [ { _id: 0, host: "mongo-shard1-0.mongo-shard1:27018" } ] })' || true
