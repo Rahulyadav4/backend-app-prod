@@ -25,7 +25,8 @@ public class Task implements Serializable {
     private String description;
 
     @NotBlank(message = "status is required")
-    @Pattern(regexp = "TODO|IN_PROGRESS|DONE|PENDING|COMPLETED|CANCELLED", message = "status must be TODO, IN_PROGRESS, or DONE")
+    @Pattern(regexp = "TODO|IN_PROGRESS|DONE|CANCELLED|COMPLETED|PENDING",
+    message = "status must be one of: TODO, IN_PROGRESS, DONE, CANCELLED, COMPLETED, PENDING")
     private String status;
 
     @Version
