@@ -33,11 +33,22 @@ public class CsvKafkaLoader {
         try (BufferedReader reader = new BufferedReader(new FileReader(csvFilePath))) {
             String line;
             boolean header = true;
+            StringBuilder accumulated = new StringBuilder();
             while ((line = reader.readLine()) != null) {
                 if (header) { header = false; continue; }
                 line = line.replace("\r", "");
-                String[] cols = line.split(",", -1);
+                if (line.trim().isEmpty()) continue;
+
+                if (accumulated.length() > 0) {
+                    accumulated.append(" ").append(line);
+                } else {
+                    accumulated.append(line);
+                }
+
+                String[] cols = accumulated.toString().split(",", 4);
                 if (cols.length < 4) continue;
+
+                accumulated.setLength(0);
 
                 Task task = new Task();
                 String id = cols[0].trim();
