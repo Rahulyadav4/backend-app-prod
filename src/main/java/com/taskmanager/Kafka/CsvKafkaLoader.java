@@ -35,6 +35,7 @@ public class CsvKafkaLoader {
             boolean header = true;
             while ((line = reader.readLine()) != null) {
                 if (header) { header = false; continue; }
+                line = line.replace("\r", "");
                 String[] cols = line.split(",", -1);
                 if (cols.length < 4) continue;
 
