@@ -96,6 +96,41 @@ Validated critical authentication, JWT, rate-limiting, CRUD, Kafka, Redis and co
 Used mocked infrastructure dependencies for isolated, deterministic unit tests without requiring live Redis/Docker.
 Established a measurable automated-testing.
 
+## Test Coverage
+
+| Metric | Coverage | Missed | Total |
+|---|---:|---:|---:|
+| Instructions | 98% | 12 | 756 |
+| Branches | 86% | 5 | 36 |
+| Lines | 98% | 4 | 218 |
+| Methods | 98% | 1 | 66 |
+| Classes | 100% | 0 | 17 |
+| Cyclomatic Complexity | — | 6 | 84 |
+
+### Package Coverage
+
+| Package | Instruction | Branch |
+|---|---:|---:|
+| `com.taskmanager.controller` | 95% | 80% |
+| `com.taskmanager.security` | 96% | 66% |
+| `com.taskmanager` | 100% | — |
+| `com.taskmanager.model` | 100% | — |
+| `com.taskmanager.config` | 100% | — |
+| `com.taskmanager.filter` | 100% | 100% |
+| `com.taskmanager.service` | 100% | — |
+| `com.taskmanager.Kafka` | 100% | 94% |
+
+### Summary
+
+- **Instruction Coverage:** 98%
+- **Branch Coverage:** 86%
+- **Line Coverage:** 98%
+- **Method Coverage:** 98%
+- **Class Coverage:** 100%
+- **Total Classes:** 17
+- **Total Methods:** 66
+- **Total Lines:** 218
+
 ---
 
 ## 🚀 Quick Start
