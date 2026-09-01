@@ -88,7 +88,7 @@ Base URL: http://localhost:8080
 | `DELETE` | `/tasks/{id}` | 🗑️ Delete task *(evicts cache)* |
 
 
-## 📡 Testing 
+### 📡 Testing 
 
 Implemented JUnit 5 + Mockito unit testing across controllers, services, security, filters, configuration, Kafka and model layers.
 Achieved 98% instruction coverage (744/756) and 86% branch coverage (31/36) using JaCoCo.
