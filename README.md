@@ -87,6 +87,15 @@ Base URL: http://localhost:8080
 | `PUT` | `/tasks/{id}` | ✏️ Update task *(evicts cache)* |
 | `DELETE` | `/tasks/{id}` | 🗑️ Delete task *(evicts cache)* |
 
+
+## 📡 Testing 
+
+Implemented JUnit 5 + Mockito unit testing across controllers, services, security, filters, configuration, Kafka and model layers.
+Achieved 98% instruction coverage (744/756) and 86% branch coverage (31/36) using JaCoCo.
+Validated critical authentication, JWT, rate-limiting, CRUD, Kafka, Redis and configuration execution paths.
+Used mocked infrastructure dependencies for isolated, deterministic unit tests without requiring live Redis/Docker.
+Established a measurable automated-testing.
+
 ---
 
 ## 🚀 Quick Start
