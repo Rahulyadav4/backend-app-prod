@@ -1,17 +1,42 @@
 package com.taskmanager.security;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class JwtUtilTest {
+import org.junit.jupiter.api.Test;
+
+class JwtUtilTest {
 
     @Test
-    void testGenerateAndValidateToken() {
+    void generateTokenShouldCreateValidToken() {
 
-        String token = JwtUtil.generateToken("admin");
+        String username = "rahul";
 
-        String username = JwtUtil.validateToken(token);
+        String token = JwtUtil.generateToken(username);
 
-        assertEquals("admin", username);
+        assertNotNull(token);
+    }
+
+    @Test
+    void validateTokenShouldReturnUsername() {
+
+        String username = "rahul";
+
+        String token = JwtUtil.generateToken(username);
+
+        String result = JwtUtil.validateToken(token);
+
+        assertEquals(username, result);
+    }
+
+    @Test
+    void validateTokenShouldRejectInvalidToken() {
+
+        String invalidToken = "invalid.token.value";
+
+        assertThrows(Exception.class, () -> {
+            JwtUtil.validateToken(invalidToken);
+        });
     }
 }
