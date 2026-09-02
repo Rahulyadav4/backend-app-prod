@@ -1,0 +1,23 @@
+ TOTAL RESULTS
+
+    checks_total.......: 16886   93.301855/s
+    checks_succeeded...: 0.00%   0 out of 16886
+    checks_failed......: 100.00% 16886 out of 16886
+
+    ✗ status is 200
+      ↳  0% — ✓ 0 / ✗ 16886
+
+    HTTP
+    http_req_duration....: avg=67.11ms min=1.64ms med=7.51ms max=14.85s p(90)=69.01ms p(95)=172.08ms
+    http_req_failed......: 100.00% 16886 out of 16886
+    http_reqs............: 16886   93.301855/s
+
+    EXECUTION
+    iteration_duration...: avg=1.06s   min=1s     med=1s     max=15.88s p(90)=1.07s   p(95)=1.17s
+    iterations...........: 16886   93.301855/s
+    vus..................: 0       min=0              max=100
+    vus_max..............: 100     min=100            max=100
+
+    NETWORK
+    data_received........: 2.8 MB  16 kB/s
+    data_sent............: 1.3 MB  7.1 kB/s

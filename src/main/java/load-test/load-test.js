@@ -10,7 +10,7 @@ export const options = {
 };
 
 export default function () {
-  const res = http.get('http://localhost:8080/tasks');
+  const res = http.get('http://localhost:57198/tasks');
 
   check(res, {
     'status is 200': (r) => r.status === 200,
@@ -18,3 +18,5 @@ export default function () {
 
   sleep(1);
 }
+
+
