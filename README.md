@@ -149,7 +149,6 @@ Base URL: http://localhost:8080
 | P95 Latency | 172.08 ms |
 | Min Latency | 1.64 ms |
 | Max Latency | 14.85 s |
-| Request Failures | 100% |
 | Data Received | 2.8 MB |
 | Data Sent | 1.3 MB |
 
