@@ -135,6 +135,24 @@ Base URL: http://localhost:8080
 - **Total Methods:** 66
 - **Total Lines:** 218
 
+### Load Test Results
+
+| Metric | Result |
+|---|---:|
+| Virtual Users | 100 |
+| Test Duration | 3 min |
+| Total Requests | 16,886 |
+| Throughput | 93.30 req/s |
+| Avg Latency | 67.11 ms |
+| Median Latency | 7.51 ms |
+| P90 Latency | 69.01 ms |
+| P95 Latency | 172.08 ms |
+| Min Latency | 1.64 ms |
+| Max Latency | 14.85 s |
+| Request Failures | 100% |
+| Data Received | 2.8 MB |
+| Data Sent | 1.3 MB |
+
 ---
 
 ## 🚀 Quick Start
