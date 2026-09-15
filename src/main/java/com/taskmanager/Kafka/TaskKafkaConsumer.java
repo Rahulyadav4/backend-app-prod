@@ -1,75 +1,66 @@
 package com.taskmanager.Kafka;
 
-import java.util.List;
-
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.stereotype.Component;
-
-import com.taskmanager.alert.service.AlertService;
 import com.taskmanager.model.Task;
 import com.taskmanager.repository.TaskRepository;
-import com.taskmanager.risk.client.RiskClient;
-import com.taskmanager.risk.model.RiskDecision;
+
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.Acknowledgment;
+
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class TaskKafkaConsumer {
 
     private final TaskRepository taskRepository;
-    private final RiskClient riskClient;
-    private final AlertService alertService;
+    private final CacheManager cacheManager;
 
     public TaskKafkaConsumer(
             TaskRepository taskRepository,
-            RiskClient riskClient,
-            AlertService alertService) {
+            CacheManager cacheManager) {
 
         this.taskRepository = taskRepository;
-        this.riskClient = riskClient;
-        this.alertService = alertService;
+        this.cacheManager = cacheManager;
     }
 
-    @org.springframework.kafka.annotation.RetryableTopic(
-            attempts = "3",
-            backoff = @Backoff(
-                    delay = 1000,
-                    multiplier = 2.0
-            )
-    )
     @KafkaListener(
             topics = "${kafka.topic.tasks}",
             groupId = "${spring.kafka.consumer.group-id}",
             concurrency = "3",
             containerFactory = "batchFactory"
     )
-    public void consume(List<Task> tasks) {
+    public void consume(
+            List<Task> tasks,
+            Acknowledgment ack) {
 
         for (Task task : tasks) {
 
-            // 1. Store transaction/work item
+            // Save task
             taskRepository.save(task);
 
-            // 2. Ask Risk Service
-            RiskDecision decision =
-                    riskClient.evaluate(task);
+            // Evict cache only when Task ID exists
+            Cache cache =
+                    cacheManager.getCache("task");
 
-            // 3. Generate alert if risky
-            if ("HIGH_RISK".equals(
-                    decision.getDecision())) {
+            if (cache != null && task.getId() != null) {
 
-                alertService.createAlert(
-                        task,
-                        decision
-                );
+                cache.evict(task.getId());
             }
+
+            System.out.println(
+                    "Processed task: " + task.getId()
+            );
         }
-    }
 
-    @org.springframework.kafka.annotation.DltHandler
-    public void handleDlt(Task task) {
+        // Manual acknowledgement
+        ack.acknowledge();
 
-        System.err.println(
-                "Task moved to DLT: " + task.getId()
+        System.out.println(
+                "Processed batch: " + tasks.size()
         );
     }
 }

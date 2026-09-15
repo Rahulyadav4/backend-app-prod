@@ -2,9 +2,13 @@ package com.taskmanager.controller;
 
 import com.taskmanager.model.Task;
 import com.taskmanager.service.TaskService;
+
 import jakarta.validation.Valid;
+
 import org.springframework.data.domain.PageRequest;
+
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,16 +21,24 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> create(
-            @RequestHeader("Idempotency-Key") String idempotencyKey,
-            @Valid @RequestBody Task task) {
+    // CONTROL ENDPOINT
+    @GetMapping("/control")
+    public ResponseEntity<String> control() {
 
-        Task result = taskService.createTask(task,idempotencyKey);
-
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok("working");
     }
 
+    // CREATE
+    @PostMapping
+    public ResponseEntity<String> create(
+            @Valid @RequestBody Task task) {
+
+        return ResponseEntity.ok(
+                taskService.createTask(task)
+        );
+    }
+
+    // GET ALL
     @GetMapping
     public ResponseEntity<?> list(
             @RequestParam(defaultValue = "0") int page,
@@ -34,18 +46,27 @@ public class TaskController {
 
         return ResponseEntity.ok(
                 taskService.listTasks(
-                        PageRequest.of(page, Math.min(size, 100))
+                        PageRequest.of(
+                                page,
+                                Math.min(size, 100)
+                        )
                 )
         );
     }
 
+    // GET ONE
     @GetMapping("/{id}")
-    public ResponseEntity<?> getTask(@PathVariable String id) {
-        return ResponseEntity.ok(taskService.getTask(id));
+    public ResponseEntity<Task> getTask(
+            @PathVariable String id) {
+
+        return ResponseEntity.ok(
+                taskService.getTask(id)
+        );
     }
 
+    // UPDATE
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(
+    public ResponseEntity<String> update(
             @PathVariable String id,
             @Valid @RequestBody Task task) {
 
@@ -56,11 +77,13 @@ public class TaskController {
         );
     }
 
+    // DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
+    public ResponseEntity<String> delete(
+            @PathVariable String id) {
 
-        taskService.deleteTask(id);
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                taskService.deleteTask(id)
+        );
     }
 }
