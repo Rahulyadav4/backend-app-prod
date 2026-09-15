@@ -1,47 +1,75 @@
 package com.taskmanager.Kafka;
 
-import com.taskmanager.model.Task;
-import com.taskmanager.repository.TaskRepository;
-
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.cache.CacheManager;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.kafka.support.Acknowledgment;
+import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Component;
-import org.springframework.cache.Cache;
+
+import com.taskmanager.alert.service.AlertService;
+import com.taskmanager.model.Task;
+import com.taskmanager.repository.TaskRepository;
+import com.taskmanager.risk.client.RiskClient;
+import com.taskmanager.risk.model.RiskDecision;
 
 @Component
 public class TaskKafkaConsumer {
 
-    private static final Logger log = LoggerFactory.getLogger(TaskKafkaConsumer.class);
     private final TaskRepository taskRepository;
-    private final CacheManager cacheManager;
+    private final RiskClient riskClient;
+    private final AlertService alertService;
 
-    public TaskKafkaConsumer(TaskRepository taskRepository, CacheManager cacheManager) {
+    public TaskKafkaConsumer(
+            TaskRepository taskRepository,
+            RiskClient riskClient,
+            AlertService alertService) {
+
         this.taskRepository = taskRepository;
-        this.cacheManager = cacheManager;
+        this.riskClient = riskClient;
+        this.alertService = alertService;
     }
 
-    @KafkaListener(
-        topics = "${kafka.topic.tasks}",
-        groupId = "${spring.kafka.consumer.group-id}",
-        concurrency = "3", // 3 parallel threads — needs >=3 partitions
-        containerFactory = "batchFactory"
+    @org.springframework.kafka.annotation.RetryableTopic(
+            attempts = "3",
+            backoff = @Backoff(
+                    delay = 1000,
+                    multiplier = 2.0
+            )
     )
-    public void consume(List<Task> tasks, Acknowledgment ack) {
+    @KafkaListener(
+            topics = "${kafka.topic.tasks}",
+            groupId = "${spring.kafka.consumer.group-id}",
+            concurrency = "3",
+            containerFactory = "batchFactory"
+    )
+    public void consume(List<Task> tasks) {
+
         for (Task task : tasks) {
-            // Upsert ALWAYS — fixes the silently-dropped-update bug
+
+            // 1. Store transaction/work item
             taskRepository.save(task);
 
-            Cache cache = cacheManager.getCache("task");
-            if (cache != null && task.getId() != null) {
-                cache.evict(task.getId()); // keep Redis in sync, not just REST paths
+            // 2. Ask Risk Service
+            RiskDecision decision =
+                    riskClient.evaluate(task);
+
+            // 3. Generate alert if risky
+            if ("HIGH_RISK".equals(
+                    decision.getDecision())) {
+
+                alertService.createAlert(
+                        task,
+                        decision
+                );
             }
         }
-        log.info("Upserted batch of {} tasks", tasks.size());
-        ack.acknowledge(); // commit only after the WHOLE batch succeeds
+    }
+
+    @org.springframework.kafka.annotation.DltHandler
+    public void handleDlt(Task task) {
+
+        System.err.println(
+                "Task moved to DLT: " + task.getId()
+        );
     }
 }

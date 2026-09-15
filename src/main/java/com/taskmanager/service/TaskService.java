@@ -1,8 +1,14 @@
 package com.taskmanager.service;
 
 import com.taskmanager.model.Task;
+import com.taskmanager.outbox.model.OutBoxEvent;
+import com.taskmanager.model.*;
+import java.util.Optional;
 import com.taskmanager.repository.TaskRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import jakarta.validation.Valid;
+import taskmanager.outbox.repository.OutBoxRepository;
+
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -16,14 +22,37 @@ import org.springframework.web.server.ResponseStatusException;
 public class TaskService {
 
     private final TaskRepository repo;
+    private final OutBoxRepository outboxrepository;
 
-    public TaskService(TaskRepository repo) {
+    public TaskService(TaskRepository repo,OutBoxRepository outboxrepository) {
         this.repo = repo;
+		this.outboxrepository = outboxrepository;
     }
 
-    public String createTask(Task task) {
-        repo.save(task);
-        return task.getId();
+    public Task createTask1(
+            Task task,
+            String idempotencyKey) {
+
+        Optional<Task> existing =
+                repo.findByIdempotencyKey(idempotencyKey);
+
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        task.setIdempotencyKey(idempotencyKey);
+
+        Task saved = repo.save(task);
+
+        OutBoxEvent event =
+                new OutBoxEvent(
+                        saved.getId(),
+                        "TASK_CREATED"
+                );
+
+        outboxrepository.save(event);
+
+        return saved;
     }
 
     public Page<Task> listTasks(Pageable pageable) {
@@ -60,4 +89,9 @@ public class TaskService {
         repo.deleteById(id);
         return "Deleted";
     }
+
+	public Task createTask(@Valid Task task, String idempotencyKey) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
