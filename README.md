@@ -19,7 +19,8 @@
 ---
 
 ## 🏗️ Architecture
-## Click to view its architecture (https://drive.google.com/file/d/1W-z2hfwhyjDCkHBGEyDrc3TKm3GG3dow/view?usp=drivesdk)
+
+[![README](https://img.shields.io/badge/README-View_Documentation-blue?style=for-the-badge)](https://drive.google.com/file/d/1W-z2hfwhyjDCkHBGEyDrc3TKm3GG3dow/view?usp=drivesdk)
 
 ┌─────────────────────────────────────────────────────────────────┐ │ REAL-TIME DATA PIPELINE │ │ │ │ 🖥️ Real-Time System │ │ │ writes rows every few milliseconds │ │ ▼ │ │ 📄 CSV Text File │ │ │ tailed by producer │ │ ▼ │ │ 📨 Kafka Producer ──────► Kafka Topic │ │ │ │ │ ▼ │ │ 📥 Kafka Consumer │ │ │ field-mapped upserts │ │ ▼ │ │ 🍃 MongoDB ◄──── Spring Boot API │ │ │ │ │ 🔴 Redis Cache ──┘ │ │ │ │ ☸️ Kubernetes │ 📈 HPA Autoscaling │ 📊 Prometheus │ └─────────────────────────────────────────────────────────────────┘
 
